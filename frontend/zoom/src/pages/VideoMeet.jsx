@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import "../styles/videomeet.css";
 
-const server_url = "https://localhost:8000";
+const server_url = "http://localhost:3000";
 
 var connections = {};
 
@@ -28,5 +28,15 @@ export default function VideoMeetComponent() {
   var videoRef = useRef([]);
   let [videos, setvideos] = useState([]);
 
-  return <div>VIdeo meet component</div>;
+  return (
+    <div>
+      {askforusername === true ? (
+        <div>
+          <h2>Enter into Lobby</h2>
+        </div>
+      ) : (
+        <></>
+      )}
+    </div>
+  );
 }
