@@ -20,7 +20,11 @@ const login = async (req, res) => {
         .json({ message: "user is not registered" });
     }
 
-    if (bcrypt.compare(password, user.password)) {
+      const passwordMatches = await bcrypt.compare(password, user.password);
+      if (!passwordMatches) {
+        return res.status(httpStatus.UNAUTHORIZED).json({ message: "invalid credentials" });
+      }
+
       let token = crypto.randomBytes(20).toString("hex");
 
       user.token = token;
@@ -28,7 +32,6 @@ const login = async (req, res) => {
       await user.save();
 
       return res.status(httpStatus.OK).json({ token: token });
-    }
   } catch (e) {
     return res.status(500).json({ message: `something went wrong ${e}` });
   }
@@ -42,7 +45,7 @@ const register = async (req, res) => {
 
     if (existingUser) {
       return res
-        .status(httpStatus.FOUND)
+        .status(httpStatus.CONFLICT)
         .json({ message: "User already exists" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -55,7 +58,7 @@ const register = async (req, res) => {
     await newUser.save();
     res.status(httpStatus.CREATED).json({ message: "User registered" });
   } catch (e) {
-    res.json({ message: `something went wrong : ${e}` });
+    res.status(500).json({ message: `something went wrong : ${e}` });
   }
 };
 
