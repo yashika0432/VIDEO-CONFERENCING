@@ -71,7 +71,8 @@ export default function Authentication() {
           xs={12}
           sm={4}
           md={7}
-          sx={{
+          style={{
+            height: "100vh",
             backgroundImage:
               "url('https://source.unsplash.com/1600x900/?wallpaper')",
             backgroundRepeat: "no-repeat",
