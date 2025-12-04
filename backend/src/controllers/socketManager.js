@@ -73,9 +73,7 @@ const connectToSocket = (server) => {
     socket.on("disconnect", () => {
       var diffTime = Math.abs(new Date() - timeOnline[socket.id]);
       var key;
-      for (const [k, v] of Object.entries(
-        JSON.parse(JSON.stringify(connections))
-      )) {
+      for (const [k, v] of Object.entries(connections)) {
         for (let a = 0; a < v.length; a++) {
           if (v[a] === socket.id) {
             key = k;
