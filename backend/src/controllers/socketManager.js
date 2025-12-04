@@ -15,6 +15,7 @@ const connectToSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
+    console.log("something connected");
     socket.on("join-call", (path) => {
       if (connections[path] === undefined) {
         connections[path] = [];
@@ -62,7 +63,7 @@ const connectToSocket = (server) => {
           data: data,
           "sender-id-sender": socket.id,
         });
-        console.log("messages", key, sender, data);
+        console.log("messages", matchingRoom, sender, data);
 
         connections[matchingRoom].forEach((id) => {
           io.to(id).emit("chat-message", data, sender, socket.id);
@@ -72,7 +73,9 @@ const connectToSocket = (server) => {
     socket.on("disconnect", () => {
       var diffTime = Math.abs(new Date() - timeOnline[socket.id]);
       var key;
-      for (const [k, v] of JSON.parse(JSON.stringify(connections))) {
+      for (const [k, v] of Object.entries(
+        JSON.parse(JSON.stringify(connections))
+      )) {
         for (let a = 0; a < v.length; a++) {
           if (v[a] === socket.id) {
             key = k;

@@ -1,6 +1,7 @@
 import React, { use, useEffect, useRef, useState } from "react";
 import "../styles/videoComponent.css";
 import { TextField, Button } from "@mui/material";
+import io from "socket.io-client";
 
 const server_url = "http://localhost:8000";
 
@@ -16,7 +17,7 @@ export default function VideoMeet() {
   let [videoAvailable, setVideoAvailable] = useState(true);
   let [audioAvailable, setAudioAvailable] = useState(true);
   let [screenAvailable, setScreenAvailable] = useState(true);
-  let [video, setVideo] = useState();
+  let [video, setVideo] = useState([]);
   let [audio, setAudio] = useState();
   let [screen, setScreen] = useState();
   let [showModals, setModals] = useState();
@@ -101,10 +102,97 @@ export default function VideoMeet() {
     }
   }, [video, audio]);
 
+  let getMessagefromServer = (fromId, message) => {};
+
+  let addMessage = () => {};
+
+  let connectToSocketServer = () => {
+    socketRef.current = io(server_url, { secure: false });
+
+    socketRef.current.on("signal", getMessagefromServer);
+    socketRef.current.on("connect", () => {
+      socketRef.current.emit("join-call", window.location.href);
+      socketIdRef.current = socketRef.current.id;
+      socketRef.current.on("chat-message", addMessage);
+      socketRef.current.on("user-left", (id) => {
+        setVideo((videos) => videos.filter((v) => v.socketId !== id));
+      });
+      socketRef.current.on("user-joined", (id, clients) => {
+        clients.forEach((socketListId) => {
+          connections[socketListId] = new RTCPeerConnection(
+            peerConnectionConfig
+          );
+          connections[socketListId].onicecandidate = (event) => {
+            if (event.candidate != null) {
+              socketRef.current.emit("signal", socketListId, {
+                ice: event.candidate,
+              });
+            }
+          };
+          connections[socketListId].onaddstream = (event) => {
+            let videoexists = videoRef.current.find(
+              (v) => v.socketId === socketListId
+            );
+            if (videoexists) {
+              setVideos((videos) => {
+                const updatevideos = videos.map((video) =>
+                  video.socketId === socketListId
+                    ? { ...video, stream: event.stream }
+                    : video
+                );
+                videoRef.current = updatevideos;
+                return updatevideos;
+              });
+            } else {
+              let newVideo = {
+                socketId: socketListId,
+                stream: event.stream,
+                autoPlay: true,
+                playsinline: true,
+              };
+              setVideos((videos) => {
+                const updatedVideos = [...videos, newVideo];
+                videoRef.current = updatedVideos;
+                return updatedVideos;
+              });
+            }
+          };
+          if (window.localStream !== undefined && window.localStream !== null) {
+            connections[socketListId].addStream(window.localStream);
+          } else {
+            //blacksilence
+          }
+        });
+        if (id === socketIdRef.current) {
+          for (let id2 in connections) {
+            if (id2 === socketIdRef.current) continue;
+
+            try {
+              connections[id2].addStream(window.localStream);
+            } catch (e) {}
+
+            connections[id2].createOffer().then((description) => {
+              connections[id2]
+                .setLocalDescription(description)
+                .then(() => {
+                  socketRef.current.emit(
+                    "signal",
+                    id2,
+                    JSON.stringify({ sdp: connections[id2].localDescription })
+                  );
+                })
+                .catch((e) => console.log(e));
+            });
+          }
+        }
+      });
+    });
+  };
+
   let getMedia = () => {
     setVideo(videoAvailable);
     setAudio(audioAvailable);
-    // connectToSocketServer();
+    connectToSocketServer();
   };
 
   let connect = () => {
