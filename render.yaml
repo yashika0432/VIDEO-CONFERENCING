@@ -1,6 +1,7 @@
 services:
   - name: VIDEO-CONFERENCING-frontend
-    type: static_site
+    type: web
+    env: static
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: build
