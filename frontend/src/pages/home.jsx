@@ -28,7 +28,11 @@ function HomeComponent() {
           <h2>Video Call</h2>
         </div>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <IconButton>
+          <IconButton
+            onClick={() => {
+              navigate("/history");
+            }}
+          >
             <RestoreIcon />
           </IconButton>
           <p>History</p>

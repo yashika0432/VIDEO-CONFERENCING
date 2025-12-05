@@ -69,10 +69,14 @@ const getUserHistory = async (req, res) => {
   const { token } = req.query;
   try {
     const user = await User.findOne({ token: token });
-    const meetings = await Meeting.find({ user_id: user.username });
-    res.json(meetings);
+    if (!user) {
+      return res.status(httpStatus.NOT_FOUND).json({ message: "User not found" });
+    }
+
+    const meetings = await Meeting.find({ userId: user.username });
+    return res.status(httpStatus.OK).json(meetings);
   } catch (e) {
-    res.json({ message: `Something went wrong ${e}` });
+    return res.status(500).json({ message: `Something went wrong ${e}` });
   }
 };
 
@@ -80,14 +84,18 @@ const addToHistory = async (req, res) => {
   const { token, meeting_code } = req.body;
   try {
     const user = await User.findOne({ token: token });
+    if (!user) {
+      return res.status(httpStatus.NOT_FOUND).json({ message: "User not found" });
+    }
+
     const newMeeting = new Meeting({
-      user_id: user.username,
+      userId: user.username,
       meetingCode: meeting_code,
     });
     await newMeeting.save();
     res.status(httpStatus.CREATED).json({ message: "Added code to history" });
   } catch (e) {
-    res.json({ message: `Something went wrong ${e}` });
+    return res.status(500).json({ message: `Something went wrong ${e}` });
   }
 };
 
