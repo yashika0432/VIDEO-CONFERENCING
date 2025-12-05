@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "../styles/videoComponent.module.css";
 import { TextField, Button, IconButton } from "@mui/material";
 import io from "socket.io-client";
@@ -11,6 +11,7 @@ import ScreenShareIcon from "@mui/icons-material/ScreenShare";
 import { Badge } from "@mui/material";
 import StopScreenShareIcon from "@mui/icons-material/StopScreenShare";
 import ChatIcon from "@mui/icons-material/Chat";
+import { useNavigate } from "react-router-dom";
 
 const server_url = "http://localhost:8000";
 
@@ -224,7 +225,15 @@ export default function VideoMeet() {
     }
   };
 
-  let addMessage = () => {};
+  let addMessage = (data, sender, socketIdSender) => {
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { sender: sender, data: data },
+    ]);
+    if (socketIdSender !== socketIdRef.current) {
+      setNewMessages((prevNewMessages) => prevNewMessages + 1);
+    }
+  };
 
   let connectToSocketServer = () => {
     socketRef.current = io(server_url, { secure: false });
@@ -398,6 +407,24 @@ export default function VideoMeet() {
     getMedia();
   };
 
+  let sendMessage = () => {
+    socketRef.current.emit("chat-message", message, username);
+    setMessage("");
+  };
+
+  let routeTo = useNavigate();
+
+  let handleEndCall = () => {
+    try {
+      let tracks = localVideoRef.current.srcObject.getTracks();
+      tracks.forEach((track) => track.stop());
+    } catch (e) {
+      console.log(e);
+    }
+
+    routeTo("/home");
+  };
+
   return (
     <div>
       {askForUsername === true ? (
@@ -423,13 +450,32 @@ export default function VideoMeet() {
             <div className={styles.chatRoom}>
               <div className={styles.chatContainer}>
                 <h2>Chat</h2>
+
+                <div className={styles.chattingDisplay}>
+                  {messages.length > 0 ? (
+                    messages.map((item, index) => {
+                      return (
+                        <div key={index} style={{ marginBottom: "20px" }}>
+                          <p style={{ fontWeight: "bold" }}>{item.sender}</p>
+                          <p>{item.data}</p>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <></>
+                  )}
+                </div>
                 <div className={styles.chattingArea}>
                   <TextField
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
                     id="outlined-basic"
                     label="Enter Your Chat Message"
                     variant="outlined"
                   ></TextField>
-                  <button variant="contained">Send</button>
+                  <Button variant="contained" onClick={sendMessage}>
+                    Send
+                  </Button>
                 </div>
               </div>
             </div>
@@ -440,7 +486,7 @@ export default function VideoMeet() {
             <IconButton style={{ color: "white " }} onClick={handleVideo}>
               {video === true ? <VideoCamIcon /> : <VideoCamOffIcon />}
             </IconButton>
-            <IconButton style={{ color: "red " }}>
+            <IconButton style={{ color: "red " }} onClick={handleEndCall}>
               <CallEndIcon />
             </IconButton>
             <IconButton style={{ color: "white " }} onClick={handleAudio}>
