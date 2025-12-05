@@ -1,0 +1,13 @@
+services:
+  - name: VIDEO-CONFERENCING-frontend
+    type: static_site
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+
+  - name: VIDEO-CONFERENCING
+    type: web
+    env: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node src/app.js
