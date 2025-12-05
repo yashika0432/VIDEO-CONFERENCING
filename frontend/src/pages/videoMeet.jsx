@@ -319,6 +319,74 @@ export default function VideoMeet() {
     setAudio(!audio);
   };
 
+  let getDisplayMediaSuccess = (stream) => {
+    try {
+      window.localStream.getTracks().forEach((track) => track.stop());
+    } catch (e) {
+      console.log(e);
+    }
+
+    window.localStream = stream;
+    localVideoRef.current.srcObject = stream;
+    for (let id in connections) {
+      if (id === socketIdRef.current) continue;
+
+      connections[id].addStream(window.localStream);
+      connections[id].createOffer().then((description) => {
+        connections[id]
+          .setLocalDescription(description)
+          .then(() => {
+            socketRef.current.emit("signal", id, {
+              sdp: connections[id].localDescription,
+            });
+          })
+          .catch((e) => console.log(e));
+      });
+    }
+
+    stream.getTracks().forEach(
+      (track) =>
+        (track.onended = () => {
+          setScreen(false);
+          try {
+            let tracks = localVideoRef.current.srcObject.getTracks();
+            tracks.forEach((track) => track.stop());
+          } catch (e) {
+            console.log(e);
+          }
+
+          let blacksilence = (...args) =>
+            new MediaStream([black(...args), silence()]);
+          window.localStream = blacksilence();
+          localVideoRef.current.srcObject = window.localStream;
+
+          getUserMedia();
+        })
+    );
+  };
+
+  let getDisplayMedia = () => {
+    if (screen) {
+      if (navigator.mediaDevices.getDisplayMedia) {
+        navigator.mediaDevices
+          .getDisplayMedia({ video: true, audio: true })
+          .then(getDisplayMediaSuccess)
+          .then((stream) => {})
+          .catch((err) => console.log(err));
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (screen !== undefined) {
+      getDisplayMedia();
+    }
+  });
+
+  let handleScreen = () => {
+    setScreen(!screen);
+  };
+
   let getMedia = () => {
     setVideo(videoAvailable);
     setAudio(audioAvailable);
@@ -362,7 +430,7 @@ export default function VideoMeet() {
               {audio === true ? <MicIcon /> : <MicOffIcon />}
             </IconButton>
             {screenAvailable === true ? (
-              <IconButton style={{ color: "white" }}>
+              <IconButton style={{ color: "white" }} onClick={handleScreen}>
                 {screen === true ? (
                   <ScreenShareIcon />
                 ) : (
