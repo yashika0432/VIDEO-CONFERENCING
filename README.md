@@ -12,3 +12,13 @@ It was built to explore:
 - Managing peer connections
 - React state management
 - Handling media streams (camera & microphone)
+
+---
+
+## ✨ Features
+- 🎥 Real-time video calling
+- 🎙️ Audio communication
+- 👥 Multi-user room support
+- 🔗 Unique meeting room links
+- 📺 Live video streams
+- ⚛️ Built with React functional components
