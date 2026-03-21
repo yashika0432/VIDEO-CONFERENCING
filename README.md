@@ -22,3 +22,12 @@ It was built to explore:
 - 🔗 Unique meeting room links
 - 📺 Live video streams
 - ⚛️ Built with React functional components
+
+---
+
+## 🛠️ Tech Stack
+- React
+- JavaScript (ES6+)
+- WebRTC
+- Socket.io / WebSockets (for signaling)
+- CSS / Tailwind 
