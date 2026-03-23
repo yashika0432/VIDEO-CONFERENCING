@@ -34,4 +34,6 @@ It was built to explore:
 
 ## 🚀 Installation
 1. Clone the repository
-   ```git clone https://github.com/yourusername/react-video-conference.git```
+   ```git clone https://github.com/yashika0432/VIDEO-CONFERENCING```
+2. Navigate to project
+   ```cd react-video-conference```
