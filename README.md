@@ -31,3 +31,7 @@ It was built to explore:
 - WebRTC
 - Socket.io / WebSockets (for signaling)
 - CSS / Tailwind 
+
+## 🚀 Installation
+1. Clone the repository
+   ```git clone https://github.com/yourusername/react-video-conference.git```
