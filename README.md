@@ -30,7 +30,9 @@ It was built to explore:
 - JavaScript (ES6+)
 - WebRTC
 - Socket.io / WebSockets (for signaling)
-- CSS / Tailwind 
+- CSS / Tailwind
+
+---
 
 ## 🚀 Installation
 1. Clone the repository
@@ -40,3 +42,6 @@ It was built to explore:
 3. Install dependencies
    ```npm install```
 
+---
+
+## 🔗 How It Works
