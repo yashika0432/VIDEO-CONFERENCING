@@ -52,6 +52,11 @@ It was built to explore:
 
 ---
 
+## ⚠️ Limitations
+
+- May not support large-scale users without TURN servers
+- Requires browser permissions for camera & microphone
+
 ## 🎯 Learning Goals
 This project demonstrates:
 - Real-time communication using WebRTC
