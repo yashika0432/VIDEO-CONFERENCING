@@ -53,3 +53,8 @@ It was built to explore:
 ---
 
 ## 🎯 Learning Goals
+This project demonstrates:
+- Real-time communication using WebRTC
+- Managing peer-to-peer connections
+- Handling media devices in the browser
+- Building interactive, scalable UI
