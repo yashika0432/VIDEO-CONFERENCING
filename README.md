@@ -45,3 +45,9 @@ It was built to explore:
 ---
 
 ## 🔗 How It Works
+1. User joins a room using a link or room ID
+2. App connects users via WebRTC peer connections
+3. Socket.io/WebSockets handle signaling
+4. Media streams (video/audio) are shared in real time
+
+---
