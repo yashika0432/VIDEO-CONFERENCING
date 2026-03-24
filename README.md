@@ -51,3 +51,5 @@ It was built to explore:
 4. Media streams (video/audio) are shared in real time
 
 ---
+
+## 🎯 Learning Goals
